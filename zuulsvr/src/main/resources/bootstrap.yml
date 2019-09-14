@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: zuulservice
+  profiles:
+    active:
+      default
+  cloud:
+    config:
+      enabled: true
+    gateway:
+      default-filters:
+      - name: Hystrix
+        args:
+          name: circuitBreaker
+      discovery:
+        locator:
+          enabled: true
+          lowerCaseServiceId: true
+          predicates:
+            - name: Path
+              args:
+                pattern: "'/api/'+serviceId.toLowerCase()+'/**'"
+          filters:
+            - name: RewritePath
+              args:
+                regexp: "'/api/' + serviceId.toLowerCase() + '/(?<remaining>.*)'"
+                replacement: "'/${remaining}'"
+            - name: AbFilter
